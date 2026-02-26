@@ -13,10 +13,17 @@ const config = {
   width: width,
   height: height,
   parent: "game-container",
-  backgroundColor: "#028af8",
+  backgroundColor: "#000000",
   scale: {
     mode: Scale.FIT,
     autoCenter: Scale.CENTER_BOTH,
+  },
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { x: 0, y: 0 },
+      debug: false,
+    },
   },
   scene: [Boot, Preload, MainGame],
 };

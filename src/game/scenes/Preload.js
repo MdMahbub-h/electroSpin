@@ -11,25 +11,37 @@ export class Preload extends Scene {
     // Load all assets
     this.load.image("a", "a.png");
     this.load.image("b", "b.png");
-    this.load.image("b_copy", "b - Copy.png");
     this.load.image("bg1", "bg1.png");
     this.load.image("bg2", "bg2.png");
     this.load.image("bg3", "bg3.png");
+    this.load.image("bg4", "bg4.png");
+    this.load.image("bg11", "bg11.png");
+    this.load.image("bg21", "bg21.png");
+    this.load.image("blink", "blink.png");
+    this.load.image("bg31", "bg31.png");
     this.load.image("electro1", "electro1.png");
     this.load.image("electro2", "electro2.png");
-    this.load.image("chatgpt1", "ChatGPT Image Feb 17, 2026, 03_23_59 AM.png");
-    this.load.image("chatgpt2", "ChatGPT Image Feb 19, 2026, 02_02_39 AM.png");
-    this.load.image(
-      "chatgpt3",
-      "ChatGPT Image Feb 19, 2026, 02_12_44 AM - Copy.png",
-    );
+    this.load.image("redElectro1", "redElectro1.png");
+    this.load.image("redElectro2", "redElectro2.png");
+    this.load.image("blueElectro1", "blueElectro1.png");
+    this.load.image("blueElectro2", "blueElectro2.png");
+    this.load.image("greenElectro1", "greenElectro1.png");
+    this.load.image("greenElectro2", "greenElectro2.png");
+
+    this.load.image("blueBtn", "blueBtn.png");
+    this.load.image("greenBtn", "greenBtn.png");
+    this.load.image("redBtn", "redBtn.png");
+
+    this.load.image("backupPower", "backupPower.png");
+    this.load.image("win500", "win500.png");
+    this.load.image("noWin", "noWin.png");
 
     // Loading bar
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     const progressBar = this.add.graphics();
     const progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillStyle(0x2222aa, 0.5);
     progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
 
     const loadingText = this.make.text({
