@@ -1,4 +1,1 @@
-- [x] Create background animation with bg1, bg2, bg3
-- [x] Create electronics animation with electro1, electro2
-- [x] Adjust positions and scales using width/height variables
-- [x] Test animations
+- [x] Enhance youWin sprite with scaling and shaking animations

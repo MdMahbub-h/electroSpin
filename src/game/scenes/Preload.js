@@ -18,6 +18,7 @@ export class Preload extends Scene {
     this.load.image("bg11", "bg11.png");
     this.load.image("bg21", "bg21.png");
     this.load.image("blink", "blink.png");
+    this.load.image("coins", "coins.png");
     this.load.image("bg31", "bg31.png");
     this.load.image("electro1", "electro1.png");
     this.load.image("electro2", "electro2.png");
@@ -35,6 +36,7 @@ export class Preload extends Scene {
     this.load.image("backupPower", "backupPower.png");
     this.load.image("win500", "win500.png");
     this.load.image("noWin", "noWin.png");
+    this.load.image("youWin", "youWin.png");
 
     // Loading bar
     const width = this.cameras.main.width;
