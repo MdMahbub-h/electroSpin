@@ -22,7 +22,7 @@ export class Game extends Scene {
     this.greenPrizePositionX = this.width * 0.8;
 
     this.createAll();
-    // this.loseAnimation();
+    this.winAnimation();
   }
 
   createAll() {
@@ -62,16 +62,7 @@ export class Game extends Scene {
     this.prizeTween = null;
   }
 
-  createCoins() {
-    this.coinSprites = [];
-    for (let i = 0; i < 30; i++) {
-      let coin = this.add
-        .sprite(Phaser.Math.Between(0, this.width), -150, "coins")
-        .setScale(0.2)
-        .setDepth(10);
-      this.coinSprites.push(coin);
-    }
-  }
+
 
   lightEffects() {
     this.lightBg = this.add
@@ -734,13 +725,13 @@ export class Game extends Scene {
         "#ffffff",
       )
       .setDepth(10)
-      .setAlpha(0.3);
+      .setAlpha(0.5);
 
     const winText = this.add
       .text(
         this.width / 2,
         this.height * 0.47,
-        `${this.winText}\n${this.amount}`,
+        `YOU ${this.winText}\n${this.amount}`,
         {
           fontFamily: "Arial Black",
           fontSize: "135px",
@@ -749,10 +740,10 @@ export class Game extends Scene {
           strokeThickness: 8,
           align: "center",
           padding: {
-            left: 20,
-            right: 20,
-            top: 10,
-            bottom: 10,
+            left: 30,
+            right: 30,
+            top: 20,
+            bottom: 20,
           },
         },
       )
@@ -778,8 +769,8 @@ export class Game extends Scene {
       .setOrigin(0.5);
     const winShine = winText.postFX.addShine(0.5, 0.2, 5);
     const amountShine = amountText.postFX.addShine(0.5, 0.2, 5);
-    winText.setShadow(0, 0, "#ff1e00", 40, true, true);
-    amountText.setShadow(0, 0, "#ff1e00", 50, true, true);
+    winText.setShadow(0, 0, "#ff1e00", 60, true, true);
+    amountText.setShadow(0, 0, "#ff1e00", 70, true, true);
 
     this.lightBg3 = this.add
       .image(this.width / 2, this.height / 2, "blink")
@@ -788,7 +779,7 @@ export class Game extends Scene {
     this.createCoins();
 
     this.tweens.add({
-      targets: [winText, amountText, this.winBg],
+      targets: [winText, amountText],
       alpha: 1,
       scale: 0.9,
       duration: 500,
@@ -817,9 +808,9 @@ export class Game extends Scene {
         targets: coin,
         y: this.height + 150,
         x: coin.x + Phaser.Math.Between(-500, 500), // horizontal spread
-        duration: 3000,
-        scale: { from: 0.3, to: 0.5 },
-        delay: index * 100,
+        duration: 2500,
+        scale: { from: 0.2, to: 0.4 },
+        delay: index * 60,
         ease: "Linear",
         onComplete: () => {
           coin.destroy();
@@ -845,6 +836,18 @@ export class Game extends Scene {
       });
     });
   }
+
+    createCoins() {
+    this.coinSprites = [];
+    for (let i = 0; i < 50; i++) {
+      let coin = this.add
+        .sprite(Phaser.Math.Between(0, this.width), -150, "coins")
+        .setScale(0.15)
+        .setDepth(10);
+      this.coinSprites.push(coin);
+    }
+  }
+
   loseAnimation() {
     this.winBg = this.add
       .rectangle(
@@ -855,12 +858,12 @@ export class Game extends Scene {
         "#ffffff",
       )
       .setDepth(10)
-      .setAlpha(0.3);
+      .setAlpha(0.5);
 
     const winText = this.add
       .text(this.width / 2, this.height * 0.47, `${this.loseText}`, {
         fontFamily: "Arial Black",
-        fontSize: "135px",
+        fontSize: "100px",
         color: "#ffd700",
         stroke: "#ff8c00",
         strokeThickness: 8,
@@ -903,7 +906,7 @@ export class Game extends Scene {
       .setDepth(11);
 
     this.tweens.add({
-      targets: [winText, amountText, this.winBg],
+      targets: [winText, amountText,],
       alpha: 1,
       scale: 0.9,
       duration: 500,
@@ -926,7 +929,7 @@ export class Game extends Scene {
       ease: "Linear",
     });
 
-    this.time.delayedCall(5000, () => {
+    this.time.delayedCall(3000, () => {
       this.lightBg3.setVisible(false);
       this.tweens.killTweensOf(winText);
       this.tweens.add({
