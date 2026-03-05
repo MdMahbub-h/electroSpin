@@ -348,6 +348,7 @@ export class Game extends Scene {
           this.isPlaying = false;
           this.time.delayedCall(2000, () => {
             this.resetGame(a);
+            this.currentElectro.setAlpha(0);
             this.lightBg2.setAlpha(0.1);
           });
         },
@@ -445,6 +446,7 @@ export class Game extends Scene {
             });
           }
 
+          this.currentElectro.setAlpha(0);
           this[`prizeSprite${a}`].destroy();
           this.resetGame(a);
         },
@@ -464,19 +466,17 @@ export class Game extends Scene {
             this.prizeTween.stop();
             this.prizeTween = null;
           }
-          this.time.delayedCall(100, () => {
-            if (this.prize1 && this.prize2 && this.prize3) {
-              this.winAnimation();
-            } else {
-              this.loseAnimation();
-            }
-          });
+          if (this.prize1 && this.prize2 && this.prize3) {
+            this.winAnimation();
+          } else {
+            this.loseAnimation();
+          }
         });
       } else {
         this.isBackupPower = false;
         this.lightBg2.setAlpha(0);
         this.isPlaying = false;
-        this.currentElectro.setAlpha(0).setScale(0.5);
+        this.currentElectro.setAlpha(0);
       }
     });
   }
@@ -959,19 +959,19 @@ export class Game extends Scene {
     this.buttonGreenPressed = false;
     this.tweens.add({
       targets: this.redBtnImg,
-      y: this.redBtnH - 10,
+      y: this.redBtnH,
       duration: 100,
       yoyo: false,
     });
     this.tweens.add({
       targets: this.blueBtnImg,
-      y: this.blueBtnH - 10,
+      y: this.blueBtnH,
       duration: 100,
       yoyo: false,
     });
     this.tweens.add({
       targets: this.greenBtnImg,
-      y: this.greenBtnH - 10,
+      y: this.greenBtnH,
       duration: 100,
       yoyo: false,
     });
