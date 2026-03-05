@@ -22,7 +22,7 @@ export class Game extends Scene {
     this.greenPrizePositionX = this.width * 0.8;
 
     this.createAll();
-    this.winAnimation();
+    // this.winAnimation();
   }
 
   createAll() {
@@ -30,6 +30,8 @@ export class Game extends Scene {
     this.createBg();
     this.createBtns();
     this.createPrizeSprites();
+
+    this.isBackupPower = false;
 
     this.currentElectro = this.add
       .sprite(this.width / 2, this.height * 0.66, "electro1")
@@ -61,8 +63,6 @@ export class Game extends Scene {
       .setVisible(false);
     this.prizeTween = null;
   }
-
-
 
   lightEffects() {
     this.lightBg = this.add
@@ -345,6 +345,7 @@ export class Game extends Scene {
         duration: 300,
         ease: "Linear",
         onComplete: () => {
+          this.isPlaying = false;
           this.time.delayedCall(2000, () => {
             this.resetGame(a);
             this.lightBg2.setAlpha(0.1);
@@ -378,7 +379,7 @@ export class Game extends Scene {
   }
   backupPower(a) {
     this.lightBg2.setAlpha(0.2);
-
+    this.isBackupPower = true;
     let posX;
 
     if (a === 1) {
@@ -455,14 +456,15 @@ export class Game extends Scene {
       if (
         this.buttonRedPressed &&
         this.buttonBluePressed &&
-        this.buttonGreenPressed
+        this.buttonGreenPressed &&
+        !this.isBackupPower
       ) {
         this.time.delayedCall(1200, () => {
           if (this.prizeTween) {
             this.prizeTween.stop();
             this.prizeTween = null;
           }
-          this.time.delayedCall(1000, () => {
+          this.time.delayedCall(100, () => {
             if (this.prize1 && this.prize2 && this.prize3) {
               this.winAnimation();
             } else {
@@ -471,6 +473,7 @@ export class Game extends Scene {
           });
         });
       } else {
+        this.isBackupPower = false;
         this.lightBg2.setAlpha(0);
         this.isPlaying = false;
         this.currentElectro.setAlpha(0).setScale(0.5);
@@ -837,7 +840,7 @@ export class Game extends Scene {
     });
   }
 
-    createCoins() {
+  createCoins() {
     this.coinSprites = [];
     for (let i = 0; i < 50; i++) {
       let coin = this.add
@@ -906,7 +909,7 @@ export class Game extends Scene {
       .setDepth(11);
 
     this.tweens.add({
-      targets: [winText, amountText,],
+      targets: [winText, amountText],
       alpha: 1,
       scale: 0.9,
       duration: 500,
@@ -949,6 +952,7 @@ export class Game extends Scene {
   }
 
   resetPlay() {
+    this.isBackupPower = false;
     this.isPlaying = false;
     this.buttonRedPressed = false;
     this.buttonBluePressed = false;
