@@ -6,6 +6,7 @@ export class Game extends Scene {
   }
 
   create() {
+    this.cameras.main.fadeIn(500);
     this.width = this.cameras.main.width;
     this.height = this.cameras.main.height;
 
@@ -22,7 +23,7 @@ export class Game extends Scene {
     this.greenPrizePositionX = this.width * 0.8;
 
     this.createAll();
-    // this.winAnimation();
+    // this.loseAnimation();
   }
 
   createAll() {
@@ -253,8 +254,6 @@ export class Game extends Scene {
   }
 
   startGame(s) {
-    if (this.isPlaying) return;
-
     this.isPlaying = true;
     let colors = [1, 2, 3];
     let anims = ["red", "blue", "green"];
@@ -284,17 +283,11 @@ export class Game extends Scene {
     let outcomes = [this.winText, this.noWinText, this.backupPowerText];
     let results = [1, 2, 3];
     let outcome = Phaser.Utils.Array.GetRandom(results);
-
-    console.log(outcome);
-    // Access dynamic sprite properly
     let sprite = this[`prizeSprite${color}`];
 
-    // Only set text if it's a text object (not a sprite)
     if (sprite.setText) {
       sprite.setText(outcomes[outcome]);
     }
-
-    // Only add tween if it's a sprite (not yet replaced with container)
     if (sprite.setAlpha) {
       this.prizeTween = this.tweens.add({
         targets: sprite,
@@ -304,10 +297,10 @@ export class Game extends Scene {
         repeat: -1,
       });
     }
-    if (outcome === 2) {
-      this.noWin(color);
-    } else if (outcome === 1) {
+    if (outcome == 1) {
       this.win500(color);
+    } else if (outcome == 2) {
+      this.noWin(color);
     } else {
       this.backupPower(color);
     }
@@ -316,7 +309,6 @@ export class Game extends Scene {
     this.lightBg2.setAlpha(0.2);
 
     let posX;
-
     if (a == 1) {
       posX = this.redPrizePositionX;
       this.prize1 = 1;
@@ -328,14 +320,12 @@ export class Game extends Scene {
       this.prize3 = 1;
     }
 
-    // Destroy old sprite if exists
-    let oldSprite = this[`prizeSprite${a}`];
-    if (oldSprite) oldSprite.destroy();
+    // Destroy old prize object
+    if (this[`prizeSprite${a}`]) {
+      this[`prizeSprite${a}`].destroy();
+    }
 
-    // Create WIN £500 text instead of sprite
     this[`prizeSprite${a}`] = this.createWin500Text(posX);
-
-    this.currentElectro.setAlpha(1);
 
     this.time.delayedCall(2500, () => {
       this.tweens.add({
@@ -345,12 +335,7 @@ export class Game extends Scene {
         duration: 300,
         ease: "Linear",
         onComplete: () => {
-          this.isPlaying = false;
-          this.time.delayedCall(2000, () => {
-            this.resetGame(a);
-            this.currentElectro.setAlpha(0);
-            this.lightBg2.setAlpha(0.1);
-          });
+          this.resetGame(a);
         },
       });
     });
@@ -359,7 +344,6 @@ export class Game extends Scene {
     this.lightBg2.setAlpha(0.1);
 
     let posX;
-
     if (a === 1) posX = this.redPrizePositionX;
     else if (a === 2) posX = this.bluePrizePositionX;
     else if (a === 3) posX = this.greenPrizePositionX;
@@ -368,21 +352,26 @@ export class Game extends Scene {
     if (this[`prizeSprite${a}`]) {
       this[`prizeSprite${a}`].destroy();
     }
-
-    // Create NO WIN text
     this[`prizeSprite${a}`] = this.createNoWinText(posX);
 
-    this.currentElectro.setAlpha(0);
-
-    this.time.delayedCall(2200, () => {
-      this.resetGame(a);
+    this.time.delayedCall(1500, () => {
+      this.tweens.add({
+        targets: this.currentElectro,
+        scaleY: 0.1,
+        alpha: 0,
+        duration: 50,
+        ease: "Linear",
+        onComplete: () => {
+          this.resetGame(a);
+        },
+      });
     });
   }
   backupPower(a) {
     this.lightBg2.setAlpha(0.2);
     this.isBackupPower = true;
-    let posX;
 
+    let posX;
     if (a === 1) {
       posX = this.redPrizePositionX;
     } else if (a === 2) {
@@ -391,18 +380,11 @@ export class Game extends Scene {
       posX = this.greenPrizePositionX;
     }
 
-    // Destroy old prize object
     if (this[`prizeSprite${a}`]) {
       this[`prizeSprite${a}`].destroy();
     }
-
-    // Create BACKUP POWER text
     this[`prizeSprite${a}`] = this.createBackupPowerText(posX);
-
-    this.currentElectro.setAlpha(1);
-
-    // Change BACKUP POWER to FREE REPLAY after 2 seconds
-    this.time.delayedCall(2000, () => {
+    this.time.delayedCall(1500, () => {
       if (this[`prizeSprite${a}`]) {
         this[`prizeSprite${a}`].destroy();
       }
@@ -414,39 +396,9 @@ export class Game extends Scene {
         targets: this.currentElectro,
         scaleY: 0.1,
         alpha: 0,
-        duration: 300,
+        duration: 500,
         ease: "Linear",
         onComplete: () => {
-          // Reset button position only (no sprite recreation needed anymore)
-          if (a === 1) {
-            this.buttonRedPressed = false;
-            this.tweens.add({
-              targets: this.redBtnImg,
-              y: this.redBtnH,
-              duration: 100,
-              yoyo: false,
-            });
-          }
-          if (a === 2) {
-            this.buttonBluePressed = false;
-            this.tweens.add({
-              targets: this.blueBtnImg,
-              y: this.blueBtnH,
-              duration: 100,
-              yoyo: false,
-            });
-          }
-          if (a === 3) {
-            this.buttonGreenPressed = false;
-            this.tweens.add({
-              targets: this.greenBtnImg,
-              y: this.greenBtnH,
-              duration: 100,
-              yoyo: false,
-            });
-          }
-
-          this.currentElectro.setAlpha(0);
           this[`prizeSprite${a}`].destroy();
           this.resetGame(a);
         },
@@ -454,14 +406,47 @@ export class Game extends Scene {
     });
   }
   resetGame(a) {
-    this.time.delayedCall(600, () => {
-      if (
-        this.buttonRedPressed &&
-        this.buttonBluePressed &&
-        this.buttonGreenPressed &&
-        !this.isBackupPower
-      ) {
-        this.time.delayedCall(1200, () => {
+    if (this.isBackupPower) {
+      this.isPlaying = false;
+      if (a === 1) {
+        this.buttonRedPressed = false;
+        this.tweens.add({
+          targets: this.redBtnImg,
+          y: this.redBtnH,
+          duration: 100,
+          yoyo: false,
+        });
+      }
+      if (a === 2) {
+        this.buttonBluePressed = false;
+        this.tweens.add({
+          targets: this.blueBtnImg,
+          y: this.blueBtnH,
+          duration: 100,
+          yoyo: false,
+        });
+      }
+      if (a === 3) {
+        this.buttonGreenPressed = false;
+        this.tweens.add({
+          targets: this.greenBtnImg,
+          y: this.greenBtnH,
+          duration: 100,
+          yoyo: false,
+        });
+      }
+      this.currentElectro.anims.stop();
+      this.time.delayedCall(100, () => {
+        this.isBackupPower = false;
+        this.lightBg2.setAlpha(0);
+      });
+    } else {
+      this.time.delayedCall(600, () => {
+        if (
+          this.buttonRedPressed &&
+          this.buttonBluePressed &&
+          this.buttonGreenPressed
+        ) {
           if (this.prizeTween) {
             this.prizeTween.stop();
             this.prizeTween = null;
@@ -471,14 +456,13 @@ export class Game extends Scene {
           } else {
             this.loseAnimation();
           }
-        });
-      } else {
-        this.isBackupPower = false;
-        this.lightBg2.setAlpha(0);
-        this.isPlaying = false;
-        this.currentElectro.setAlpha(0);
-      }
-    });
+        } else {
+          this.lightBg2.setAlpha(0);
+          this.isPlaying = false;
+          this.currentElectro.setAlpha(0);
+        }
+      });
+    }
   }
   createWin500Text(x) {
     const container = this.add.container(x, this.allPrizePositionY).setDepth(6);
@@ -730,36 +714,18 @@ export class Game extends Scene {
       .setDepth(10)
       .setAlpha(0.5);
 
-    const winText = this.add
-      .text(
-        this.width / 2,
-        this.height * 0.47,
-        `YOU ${this.winText}\n${this.amount}`,
-        {
-          fontFamily: "Arial Black",
-          fontSize: "135px",
-          color: "#ffd700",
-          stroke: "#ff8c00",
-          strokeThickness: 8,
-          align: "center",
-          padding: {
-            left: 30,
-            right: 30,
-            top: 20,
-            bottom: 20,
-          },
-        },
-      )
+    const winImage = this.add
+      .image(this.width / 2, this.height * 0.5, "youWin")
       .setDepth(11)
-      .setOrigin(0.5);
+      .setScale(0.7);
 
-    const amountText = this.add
-      .text(this.width / 2, this.height * 0.53, "", {
+    const winText = this.add
+      .text(this.width / 2, this.height * 0.49, `YOU ${this.winText}`, {
         fontFamily: "Arial Black",
-        fontSize: "150px",
-        color: "#ffb700",
-        stroke: "rgba(194, 94, 0, 0.71)",
-        strokeThickness: 10,
+        fontSize: "80px",
+        color: "#d2edff",
+        stroke: "#0077ff",
+        strokeThickness: 6,
         align: "center",
         padding: {
           left: 20,
@@ -768,13 +734,30 @@ export class Game extends Scene {
           bottom: 10,
         },
       })
+      .setOrigin(0.5, 1)
+      .setDepth(11);
+
+    const amountText = this.add
+      .text(this.width / 2, this.height * 0.52, "£500", {
+        fontFamily: "Arial Black",
+        fontSize: "120px",
+        color: "#c6ecff",
+        stroke: "#0077ff",
+        align: "center",
+        padding: {
+          left: 20,
+          right: 20,
+          top: 10,
+          bottom: 10,
+        },
+        strokeThickness: 8,
+      })
       .setDepth(11)
       .setOrigin(0.5);
     const winShine = winText.postFX.addShine(0.5, 0.2, 5);
     const amountShine = amountText.postFX.addShine(0.5, 0.2, 5);
-    winText.setShadow(0, 0, "#ff1e00", 60, true, true);
-    amountText.setShadow(0, 0, "#ff1e00", 70, true, true);
-
+    winText.setShadow(0, 0, "#00bfff", 25, true, true);
+    amountText.setShadow(0, 0, "#00bfff", 40, true, true);
     this.lightBg3 = this.add
       .image(this.width / 2, this.height / 2, "blink")
       .setAlpha(0)
@@ -790,7 +773,7 @@ export class Game extends Scene {
 
     this.tweens.add({
       targets: this.lightBg3,
-      alpha: 0.9,
+      alpha: 0.5,
       duration: 500,
     });
 
@@ -798,11 +781,25 @@ export class Game extends Scene {
 
     this.tweens.add({
       targets: [winText, amountText],
-      duration: 500,
+      duration: 700,
       scale: { from: 1.2, to: 0.88 },
       yoyo: true,
       repeat: -1,
-      ease: "Linear",
+      ease: "Sine.easeInOut",
+    });
+
+    this.tweens.add({
+      targets: [winImage],
+      alpha: 1,
+      duration: 500,
+    });
+    this.tweens.add({
+      targets: [winImage],
+      duration: 700,
+      scale: { from: 0.8, to: 0.7 },
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
     });
 
     // Animate coins falling
@@ -821,36 +818,25 @@ export class Game extends Scene {
       });
     });
 
-    this.time.delayedCall(5000, () => {
-      this.lightBg3.setVisible(false);
+    this.time.delayedCall(7000, () => {
       this.tweens.killTweensOf(winText);
+      this.cameras.main.fadeOut(600);
       this.tweens.add({
-        targets: [winText, amountText, this.winBg],
+        targets: [winText, amountText, this.winBg, this.lightBg3, winImage],
         alpha: 0,
-        duration: 300,
+        duration: 500,
         onComplete: () => {
-          this.lightBg3.setVisible(false);
+          this.lightBg3.destroy();
           this.tweens.killTweensOf(winText);
           this.tweens.killTweensOf(amountText);
           winText.destroy();
           amountText.destroy();
+          winImage.destroy();
           this.resetPlay();
         },
       });
     });
   }
-
-  createCoins() {
-    this.coinSprites = [];
-    for (let i = 0; i < 50; i++) {
-      let coin = this.add
-        .sprite(Phaser.Math.Between(0, this.width), -150, "coins")
-        .setScale(0.15)
-        .setDepth(10);
-      this.coinSprites.push(coin);
-    }
-  }
-
   loseAnimation() {
     this.winBg = this.add
       .rectangle(
@@ -858,17 +844,23 @@ export class Game extends Scene {
         this.height / 2,
         this.width * 1.2,
         this.height * 1.2,
-        "#ffffff",
+        "#000000",
       )
       .setDepth(10)
-      .setAlpha(0.5);
+      .setAlpha(0.6);
 
-    const winText = this.add
-      .text(this.width / 2, this.height * 0.47, `${this.loseText}`, {
+    const loseImage = this.add
+      .image(this.width / 2, this.height * 0.5, "youLose")
+      .setDepth(11)
+      .setScale(0.7)
+      .setAlpha(0);
+
+    const loseText = this.add
+      .text(this.width / 2, this.height * 0.5, `${this.loseText}`, {
         fontFamily: "Arial Black",
-        fontSize: "100px",
-        color: "#ffd700",
-        stroke: "#ff8c00",
+        fontSize: "160px",
+        color: "#ff5a5a",
+        stroke: "#ffffff",
         strokeThickness: 8,
         align: "center",
         padding: {
@@ -881,27 +873,7 @@ export class Game extends Scene {
       .setDepth(11)
       .setOrigin(0.5);
 
-    const amountText = this.add
-      .text(this.width / 2, this.height * 0.53, "", {
-        fontFamily: "Arial Black",
-        fontSize: "150px",
-        color: "#ffb700",
-        stroke: "rgba(194, 94, 0, 0.71)",
-        strokeThickness: 10,
-        align: "center",
-        padding: {
-          left: 20,
-          right: 20,
-          top: 10,
-          bottom: 10,
-        },
-      })
-      .setDepth(11)
-      .setOrigin(0.5);
-    const winShine = winText.postFX.addShine(0.5, 0.2, 5);
-    const amountShine = amountText.postFX.addShine(0.5, 0.2, 5);
-    winText.setShadow(0, 0, "#ff1e00", 40, true, true);
-    amountText.setShadow(0, 0, "#ff1e00", 50, true, true);
+    loseText.setShadow(0, 0, "#ffffff", 40, true, true);
 
     this.lightBg3 = this.add
       .image(this.width / 2, this.height / 2, "blink")
@@ -909,46 +881,61 @@ export class Game extends Scene {
       .setDepth(11);
 
     this.tweens.add({
-      targets: [winText, amountText],
+      targets: [loseText],
       alpha: 1,
       scale: 0.9,
-      duration: 500,
+      duration: 400,
     });
 
     this.tweens.add({
       targets: this.lightBg3,
-      alpha: 0.9,
-      duration: 500,
+      alpha: 0.3,
+      duration: 400,
     });
-
-    // Shaking effect
 
     this.tweens.add({
-      targets: [winText, amountText],
-      duration: 500,
-      scale: { from: 1.2, to: 0.88 },
-      yoyo: true,
-      repeat: -1,
-      ease: "Linear",
+      targets: [loseImage],
+      alpha: 1,
+      duration: 400,
     });
 
-    this.time.delayedCall(3000, () => {
-      this.lightBg3.setVisible(false);
-      this.tweens.killTweensOf(winText);
+    // pulse ring
+    this.tweens.add({
+      targets: [loseImage, loseText],
+      duration: 700,
+      scale: { from: 0.6, to: 0.7 },
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+
+    this.time.delayedCall(5000, () => {
+      this.tweens.killTweensOf(loseText);
+      this.cameras.main.fadeOut(600);
+
       this.tweens.add({
-        targets: [winText, amountText, this.winBg],
+        targets: [loseText, this.winBg, this.lightBg3, loseImage],
         alpha: 0,
-        duration: 300,
+        duration: 400,
         onComplete: () => {
-          this.lightBg3.setVisible(false);
-          this.tweens.killTweensOf(winText);
-          this.tweens.killTweensOf(amountText);
-          winText.destroy();
-          amountText.destroy();
+          this.lightBg3.destroy();
+          this.tweens.killTweensOf(loseText);
+          loseText.destroy();
+          loseImage.destroy();
           this.resetPlay();
         },
       });
     });
+  }
+  createCoins() {
+    this.coinSprites = [];
+    for (let i = 0; i < 50; i++) {
+      let coin = this.add
+        .sprite(Phaser.Math.Between(0, this.width), -150, "coins")
+        .setScale(0.15)
+        .setDepth(10);
+      this.coinSprites.push(coin);
+    }
   }
 
   resetPlay() {
@@ -978,10 +965,18 @@ export class Game extends Scene {
     this.prize1 = 0;
     this.prize2 = 0;
     this.prize3 = 0;
+    this.currentElectro.destroy();
+    this.currentElectro = this.add
+      .sprite(this.width / 2, this.height * 0.66, "electro1")
+      .setAlpha(0)
+      .setOrigin(0.5, 1)
+      .setScale(1);
     this.prizeSprite1.destroy();
     this.prizeSprite2.destroy();
     this.prizeSprite3.destroy();
     this.prizeTween = null;
+    this.lightBg2.setAlpha(0);
     this.createPrizeSprites();
+    this.cameras.main.fadeIn(500);
   }
 }

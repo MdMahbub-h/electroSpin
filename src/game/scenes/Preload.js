@@ -33,10 +33,8 @@ export class Preload extends Scene {
     this.load.image("greenBtn", "greenBtn.png");
     this.load.image("redBtn", "redBtn.png");
 
-    this.load.image("backupPower", "backupPower.png");
-    this.load.image("win500", "win500.png");
-    this.load.image("noWin", "noWin.png");
     this.load.image("youWin", "youWin.png");
+    this.load.image("youLose", "youLose.png");
 
     // Loading bar
     const width = this.cameras.main.width;
